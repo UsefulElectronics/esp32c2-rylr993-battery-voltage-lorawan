@@ -75,12 +75,12 @@ void uart_config(void)
     const uart_config_t uart_config =
     {
     	//TODO								//Baud rate must be set to 115200 for PingPong Example
-        .baud_rate = 9600,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-        .source_clk = UART_SCLK_APB,
+        .baud_rate  = 9600,
+        .data_bits  = UART_DATA_8_BITS,
+        .parity     = UART_PARITY_DISABLE,
+        .stop_bits  = UART_STOP_BITS_1,
+        .flow_ctrl  = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_DEFAULT,
     };
     // We won't use a buffer for sending data.
     uart_driver_install(UART_AT_PORT, RX_BUF_SIZE * 2, TX_BUF_SIZE * 2, 20, &uartRx_queue, 0);
@@ -132,7 +132,7 @@ void uart_event_task(void *pvParameters)
     for(;;)
     {
         //Waiting for UART event.
-        if(xQueueReceive(uartRx_queue, (void * )&event, (portTickType)portMAX_DELAY))
+        if(xQueueReceive(uartRx_queue, (void * )&event, portMAX_DELAY))
         {
             bzero(dtmp, RX_BUF_SIZE);
 

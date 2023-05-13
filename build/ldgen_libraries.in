@@ -8,6 +8,7 @@ $<TARGET_FILE:__idf_esp_app_format>
 $<TARGET_FILE:__idf_bootloader_support>
 $<TARGET_FILE:__idf_esp_partition>
 $<TARGET_FILE:__idf_app_update>
+$<TARGET_FILE:__idf_esp_mm>
 $<TARGET_FILE:__idf_spi_flash>
 $<TARGET_FILE:__idf_pthread>
 $<TARGET_FILE:__idf_esp_system>
@@ -30,6 +31,7 @@ $<TARGET_FILE:__idf_vfs>
 $<TARGET_FILE:__idf_lwip>
 $<TARGET_FILE:__idf_esp_netif>
 $<TARGET_FILE:__idf_wpa_supplicant>
+$<TARGET_FILE:__idf_esp_coex>
 $<TARGET_FILE:__idf_esp_wifi>
 $<TARGET_FILE:__idf_unity>
 $<TARGET_FILE:__idf_cmock>
@@ -38,6 +40,7 @@ $<TARGET_FILE:__idf_http_parser>
 $<TARGET_FILE:__idf_esp-tls>
 $<TARGET_FILE:__idf_esp_adc>
 $<TARGET_FILE:__idf_esp_eth>
+$<TARGET_FILE:__idf_esp_gdbstub>
 $<TARGET_FILE:__idf_esp_hid>
 $<TARGET_FILE:__idf_tcp_transport>
 $<TARGET_FILE:__idf_esp_http_client>

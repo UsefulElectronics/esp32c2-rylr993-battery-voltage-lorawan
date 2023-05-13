@@ -1,8 +1,8 @@
-# Install script for directory: C:/Espressif/frameworks/esp-idf-v5.0.1
+# Install script for directory: /home/ward/esp/esp-idf
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/bootloader")
+  set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,101 +34,101 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/Espressif/tools/riscv32-esp-elf/esp-2022r1-11.2.0/riscv32-esp-elf/bin/riscv32-esp-elf-objdump.exe")
+  set(CMAKE_OBJDUMP "/home/ward/.espressif/tools/riscv32-esp-elf/esp-12.2.0_20230208/riscv32-esp-elf/bin/riscv32-esp-elf-objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/riscv/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/riscv/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/newlib/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/newlib/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/soc/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/soc/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/micro-ecc/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/micro-ecc/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/hal/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/hal/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/spi_flash/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/spi_flash/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/esp_app_format/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/esp_app_format/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/bootloader_support/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/bootloader_support/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/efuse/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/efuse/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/esp_system/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/esp_system/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/esp_hw_support/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/esp_hw_support/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/esp_common/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/esp_common/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/esp_rom/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/esp_rom/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/log/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/log/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/esptool_py/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/esptool_py/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/partition_table/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/partition_table/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/bootloader/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/bootloader/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/freertos/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/freertos/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Espressif/frameworks/esp-idf-v5.0.1/workspace/esp32c2-rylr993-hlk-ld2410-lorawan/build/bootloader/esp-idf/main/cmake_install.cmake")
+  include("/home/ward/esp/esp-idf/work_space/esp32c2-rylr993-battery-voltage-lorawan/build/bootloader/esp-idf/main/cmake_install.cmake")
 endif()
 

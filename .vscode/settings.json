@@ -1,0 +1,6 @@
+{
+    "idf.adapterTargetName": "esp32c2",
+    "files.associations": {
+        "uart_config.h": "c"
+    }
+}
