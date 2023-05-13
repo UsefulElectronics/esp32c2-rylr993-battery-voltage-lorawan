@@ -31,6 +31,6 @@
 
 
 
-#endif /* MAIN_MAIN_H_ */
+#endif /* MAIN_H_ */
 
 /*************************************** USEFUL ELECTRONICS*****END OF FILE****/
