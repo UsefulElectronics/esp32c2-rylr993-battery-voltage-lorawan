@@ -42,12 +42,33 @@
 /* MACROS --------------------------------------------------------------------*/
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
-
+static void main_creatSystemTasks(void);
+static void system_send_to_queue(void *packetPointer);
+static void system_lorawan_callback(char rx_data);
 /* FUNCTION PROTOTYPES -------------------------------------------------------*/
 void app_main(void)
 {
+   uart_config();
 
-//    xTaskCreate(rx_task, "uart_rx_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+   rlyr993_init(system_send_to_queue, system_lorawan_callback);
+
+   main_creatSystemTasks();
+
+}
+
+static void main_creatSystemTasks(void)
+{
+	xTaskCreatePinnedToCore(uart_event_task, "uart event", 10000, NULL, 4, NULL, 1);
+
+	xTaskCreatePinnedToCore(uart_transmission_task, "USART TX handling task", 10000, NULL, 4, NULL, 1);
+}
+
+static void system_send_to_queue(void *packetPointer)
+{
+   xQueueSendToBack(uartTx_queue, packetPointer, portMAX_DELAY);
+}
+static void system_lorawan_callback(char rx_data)
+{
 
 }
 
