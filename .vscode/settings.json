@@ -15,7 +15,15 @@
         "stdbool.h": "c",
         "*.tcc": "c",
         "cstdio": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "array": "c",
+        "bitset": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "regex": "c",
+        "utility": "c",
+        "adc_config.h": "c",
+        "stdio.h": "c"
     },
     "idf.flashType": "UART",
     "idf.port": "/dev/ttyUSB0",
