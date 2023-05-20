@@ -32,7 +32,9 @@
 const static char *TAG = "ADC";
 /* MACROS --------------------------------------------------------------------*/
 #define ADC1_CHAN0                  ADC_CHANNEL_0
-#define EXAMPLE_ADC_ATTEN           ADC_ATTEN_DB_11
+#define ADC_ATTEN                   ADC_ATTEN_DB_11
+
+
 /* ENUMERATIONS --------------------------------------------------------------*/
 
 /* STRUCTURES & TYPEDEFS -----------------------------------------------------*/
@@ -40,8 +42,8 @@ const static char *TAG = "ADC";
 /* VARIABLES -----------------------------------------------------------------*/
 
 /* FUNCTIONS DECLARATION -----------------------------------------------------*/
-
-
+uint16_t adc_read_voltage(float voltage_divider_ration);
+void adc_config(void);
 
 #endif /* MAIN_ADC_H_ */
 

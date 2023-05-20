@@ -50,6 +50,7 @@ rlyr993_handler hRlyr993 = {0};
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
 static uint16_t rlyr993_make_command(char* targetString, char* command, char* parameter);
+static uint16_t rlyr993_make_request(char* targetString, char* command);
 /* FUNCTION PROTOTYPES -------------------------------------------------------*/
 /**
  * @brief   Initialize LoRaWAN module driver that will send AT commands and callback a function when receiving data
@@ -129,6 +130,7 @@ void rlyr993_set_appkey(void)
 
     hRlyr993.commandSend(&module_data);
 }
+
 /**
  * @brief Set LoRaWAN communication EU868 band
  * 
@@ -178,6 +180,45 @@ void rlyr993_join_request(void)
     hRlyr993.commandSend(&module_data);
 }
 /**
+ * @brief Pars the packet received from the LoRaWAN module 
+ * 
+ * @param   packet      :   received packet data content 
+ * 
+ * @param   packet_size :   received packet size in bytes
+ * 
+ * @return  bool        :   true if packet is valid 
+ */
+bool rlyr993_packet_parser(uint8_t* packet, uint8_t packet_size)
+{
+    bool validPacket = false;
+
+    return validPacket;
+}
+/**
+ * @brief Get the scrounging temperature from the module internal sensor
+ * 
+ */
+void rlyr993_get_temperature(void)
+{
+    rlyr993_buffer module_data = {0};
+
+    module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, TEMPERATURE);
+
+    hRlyr993.commandSend(&module_data);
+}
+/**
+ * @brief Get the time
+ * 
+ */
+void rlyr993_get_time(void)
+{
+    rlyr993_buffer module_data = {0};
+
+    module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, LOCAL_TIME);
+
+    hRlyr993.commandSend(&module_data);
+}
+/**
  * @brief   Construct AT command using the passed parameters to be sent to the module.
  * 
  * @param   command     :   AT command string.
@@ -195,6 +236,28 @@ static uint16_t rlyr993_make_command(char* targetString, char* command, char* pa
             command, 
             SET_VALUE, 
             parameter, 
+            TERMINATOR);
+
+    stringLength = strlen(targetString);
+
+    return stringLength;
+}
+
+/**
+ * @brief   Construct AT command using the passed parameters to get parameter from the module.
+ * 
+ * @param   command     :   AT command string.
+ * 
+ * @return  uint16_t    :   The size of the constructed command length.
+ */
+static uint16_t rlyr993_make_request(char* targetString, char* command)
+{
+    uint16_t stringLength = 0;
+
+    sprintf(targetString, "%s%s%s%s", 
+            AT, 
+            command, 
+            GET_VALUE,  
             TERMINATOR);
 
     stringLength = strlen(targetString);

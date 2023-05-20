@@ -122,12 +122,31 @@ void rlyr993_set_appeui(void);
  * 
  */
 void rlyr993_set_networkId(void);
-
+/**
+ * @brief Get the scrounging temperature from the module internal sensor
+ * 
+ */
+void rlyr993_get_temperature(void);
+/**
+ * @brief Get time
+ * 
+ */
+void rlyr993_get_time(void);
 /**
  * @brief LoRaWAN join request with OTAA method 
  * 
  */
 void rlyr993_join_request(void);
+/**
+ * @brief Pars the packet received from the LoRaWAN module 
+ * 
+ * @param   packet      :   received packet data content 
+ * 
+ * @param   packet_size :   received packet size in bytes
+ * 
+ * @return  bool        :   true if packet is valid 
+ */
+bool rlyr993_packet_parser(uint8_t* packet, uint8_t packet_size);
 /**
  * @brief Set Module communication mode whether it is peer to peer or LoRaWAN
  * 

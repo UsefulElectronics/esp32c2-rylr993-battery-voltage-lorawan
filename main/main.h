@@ -19,9 +19,12 @@
 
 /* INCLUDES ------------------------------------------------------------------*/
 #include "uart_config.h"
+#include "adc_config.h"
 #include "rlyr993.h"
 /* MACROS --------------------------------------------------------------------*/
-
+#define ADC_VOLTAGE_DIV_R1          820//KOhm
+#define ADC_VOLTAGE_DIV_R2          1000//KOhm
+#define ADC_VOLTAGE_DIV_RATIO       (float)((ADC_VOLTAGE_DIV_R1 + ADC_VOLTAGE_DIV_R2) / (ADC_VOLTAGE_DIV_R2))
 /* ENUMORATIONS --------------------------------------------------------------*/
 
 /* STRUCTURES & TYPEDEFS -----------------------------------------------------*/
