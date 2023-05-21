@@ -75,8 +75,17 @@
 #define GET_VALUE				"=?"
 #define SET_VALUE				"="
 #define TERMINATOR				"\r"
+#define RESPONSE_ENDING			"\r\n"
+#define SPACE					0x20
+
+#define MSG_REPORT				"+EVT:"
+#define PARAM_REPORT			"RX_1"
+#define JOIN_REPORT				"JOINED"
 
 #define RLYR993_MAX_PACK_SIZE   1024
+
+#define MAX_PPACKETS			5
+#define MAX_PACKET_SIZE			100
 /* ENUMORATIONS --------------------------------------------------------------*/
 
 /* STRUCTURES & TYPEDEFS -----------------------------------------------------*/
@@ -138,7 +147,7 @@ void rlyr993_get_time(void);
  */
 void rlyr993_join_request(void);
 /**
- * @brief Pars the packet received from the LoRaWAN module 
+ * @brief 	Separates the packet received from the LoRaWAN module 
  * 
  * @param   packet      :   received packet data content 
  * 
@@ -146,7 +155,7 @@ void rlyr993_join_request(void);
  * 
  * @return  bool        :   true if packet is valid 
  */
-bool rlyr993_packet_parser(uint8_t* packet, uint8_t packet_size);
+bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size);
 /**
  * @brief Set Module communication mode whether it is peer to peer or LoRaWAN
  * 

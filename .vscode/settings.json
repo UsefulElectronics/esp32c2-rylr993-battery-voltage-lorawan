@@ -23,7 +23,8 @@
         "regex": "c",
         "utility": "c",
         "adc_config.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "sstream": "c"
     },
     "idf.flashType": "UART",
     "idf.port": "/dev/ttyUSB0",

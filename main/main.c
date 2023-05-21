@@ -36,7 +36,7 @@
 /* PRIVATE STRUCTRES ---------------------------------------------------------*/
 
 /* VARIABLES -----------------------------------------------------------------*/
-
+const static char *TAG = "MAIN";
 /* DEFINITIONS ---------------------------------------------------------------*/
 
 /* MACROS --------------------------------------------------------------------*/
@@ -83,7 +83,7 @@ static void uart_reception_task(void *pvParameters)
       //Waiting for UART packet to get received.
       if(xQueueReceive(uartRxStore_queue, (void * )&uartHandler, portMAX_DELAY))
       {
-         rlyr993_packet_parser(uartHandler.uart_rxBuffer, uartHandler.uart_rxPacketSize);
+         rlyr993_packet_separator(uartHandler.uart_rxBuffer, uartHandler.uart_rxPacketSize);
       }
    }
 }

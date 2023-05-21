@@ -29,7 +29,7 @@
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
 
-const static char *TAG = "ADC";
+
 /* MACROS --------------------------------------------------------------------*/
 #define ADC1_CHAN0                  ADC_CHANNEL_0
 #define ADC_ATTEN                   ADC_ATTEN_DB_11

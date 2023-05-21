@@ -16,12 +16,22 @@
 
 /* INCLUDES ------------------------------------------------------------------*/
 #include "rlyr993.h"
-
+#include "esp_log.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 /* PRIVATE STRUCTURES --------------------------------------------------------*/
 typedef struct 
 {
-    void  (*commandSend)     (void *tx_buffer);
-    void  (*receiveCallback) (void);
+    void    (*commandSend)     (void *tx_buffer);
+    void    (*receiveCallback) (void);
+    bool     networkStatus;
+    int32_t  temperature;
+    int  rssi;
+    int  snr;
+    int  dr;
+    
 }rlyr993_handler;
 typedef struct 
 {
@@ -44,6 +54,8 @@ typedef struct
 
 /* VARIABLES -----------------------------------------------------------------*/
 rlyr993_handler hRlyr993 = {0};
+char packetHolder[MAX_PPACKETS][MAX_PACKET_SIZE] = {0};
+const static char *TAG = "RYLR";
 /* DEFINITIONS ---------------------------------------------------------------*/
 
 /* MACROS --------------------------------------------------------------------*/
@@ -180,7 +192,7 @@ void rlyr993_join_request(void)
     hRlyr993.commandSend(&module_data);
 }
 /**
- * @brief Pars the packet received from the LoRaWAN module 
+ * @brief   Separator the packet received from the LoRaWAN module 
  * 
  * @param   packet      :   received packet data content 
  * 
@@ -188,10 +200,67 @@ void rlyr993_join_request(void)
  * 
  * @return  bool        :   true if packet is valid 
  */
+bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size)
+{
+    bool validPacket = false;
+
+    //  char token[MAX_PACKET_SIZE] = {0};
+
+    uint8_t packetCounter = 0;
+
+    uint8_t charCounter = 0;
+
+    ESP_LOGI(TAG, "%s", packet);
+
+    char *pToken = strtok((char *)packet, "\r\n");
+
+
+    while(pToken != NULL)
+    {
+        strcpy(packetHolder[packetCounter], pToken);
+
+        ++packetCounter;
+        
+        pToken = strtok(NULL, "\r\n");
+
+        ESP_LOGI(TAG, "%s", packetHolder[packetCounter]);
+    }
+
+    return validPacket;
+}
 bool rlyr993_packet_parser(uint8_t* packet, uint8_t packet_size)
 {
     bool validPacket = false;
 
+    const uint8_t packetBase = 0; 
+    //Offset buffer if it starts with space character 
+    packet = (packet[packetBase] == SPACE) ? (packet + 1) : packet;
+    //Module report packet check
+    if(!strncmp((char*)packet ,MSG_REPORT ,sizeof(MSG_REPORT)))
+    {
+        
+        //report header ignore 
+        packet = packet + sizeof(MSG_REPORT);
+
+        if(!strncmp((char*)packet ,PARAM_REPORT ,sizeof(PARAM_REPORT)))
+        {
+            sscanf((char*)packet, "RX_1, DR %d, RSSI %d, SNR %d", &hRlyr993.rssi, &hRlyr993.rssi, &hRlyr993.snr);
+
+            validPacket = true;
+        }
+        else if(!strncmp((char*)packet ,JOIN_REPORT ,sizeof(JOIN_REPORT)))
+        {
+            validPacket = true;
+
+            hRlyr993.networkStatus = true;
+        }
+    }
+    else if(isdigit(packet[packetBase]))
+    {
+        validPacket = true;
+
+        hRlyr993.temperature = atoi((char*)packet);
+    }
     return validPacket;
 }
 /**
