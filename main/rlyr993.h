@@ -78,6 +78,7 @@
 #define RESPONSE_ENDING			"\r\n"
 #define SPACE					0x20
 
+
 #define MSG_REPORT				"+EVT:"
 #define PARAM_REPORT			"RX_1"
 #define JOIN_REPORT				"JOINED"
@@ -161,7 +162,18 @@ bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size);
  * 
  */
 void rlyr993_set_mode(char* mode);
-
+/**
+ * @brief   Check if the module has joined lorawan network 
+ * 
+ * @return  true if joined
+ */
+bool rlyr993_joined_check(void);
+/**
+ * @brief   The module has temperature sensor. This function works only if rlyr993_get_temperature is called periodically 
+ * 
+ * @return  int :   the read temperature value 
+ */
+int rlyr993_read_temperature(void);
 #endif /* MAIN_TRLYR993_H_ */
 
 /*************************************** USEFUL ELECTRONICS*****END OF FILE****/

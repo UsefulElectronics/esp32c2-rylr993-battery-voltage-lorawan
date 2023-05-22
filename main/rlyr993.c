@@ -63,6 +63,7 @@ const static char *TAG = "RYLR";
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
 static uint16_t rlyr993_make_command(char* targetString, char* command, char* parameter);
 static uint16_t rlyr993_make_request(char* targetString, char* command);
+static bool     rlyr993_packet_parser(uint8_t* packet);
 /* FUNCTION PROTOTYPES -------------------------------------------------------*/
 /**
  * @brief   Initialize LoRaWAN module driver that will send AT commands and callback a function when receiving data
@@ -210,7 +211,7 @@ bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size)
 
     uint8_t charCounter = 0;
 
-    ESP_LOGI(TAG, "%s", packet);
+    // ESP_LOGI(TAG, "%s", packet);
 
     char *pToken = strtok((char *)packet, "\r\n");
 
@@ -220,39 +221,50 @@ bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size)
         strcpy(packetHolder[packetCounter], pToken);
 
         ++packetCounter;
+
+        rlyr993_packet_parser((uint8_t*)pToken);
         
         pToken = strtok(NULL, "\r\n");
 
-        ESP_LOGI(TAG, "%s", packetHolder[packetCounter]);
+        // ESP_LOGI(TAG, "%s", packetHolder[packetCounter]);
     }
 
     return validPacket;
 }
-bool rlyr993_packet_parser(uint8_t* packet, uint8_t packet_size)
+static bool rlyr993_packet_parser(uint8_t* packet)
 {
     bool validPacket = false;
 
     const uint8_t packetBase = 0; 
     //Offset buffer if it starts with space character 
-    packet = (packet[packetBase] == SPACE) ? (packet + 1) : packet;
+    if(packet[packetBase] == SPACE)
+    {
+        ++packet;
+    }
+    // packet = (packet[packetBase] == SPACE) ? (packet + 1) : packet;
+
+    
     //Module report packet check
-    if(!strncmp((char*)packet ,MSG_REPORT ,sizeof(MSG_REPORT)))
+    if(!strncmp((char*)packet ,MSG_REPORT ,strlen(MSG_REPORT)))
     {
         
         //report header ignore 
-        packet = packet + sizeof(MSG_REPORT);
+        packet = packet + strlen(MSG_REPORT) ;
 
-        if(!strncmp((char*)packet ,PARAM_REPORT ,sizeof(PARAM_REPORT)))
+        ESP_LOGI(TAG, "%s", packet);
+
+        if(!strncmp((char*)packet ,PARAM_REPORT ,strlen(PARAM_REPORT)))
         {
             sscanf((char*)packet, "RX_1, DR %d, RSSI %d, SNR %d", &hRlyr993.rssi, &hRlyr993.rssi, &hRlyr993.snr);
 
             validPacket = true;
         }
-        else if(!strncmp((char*)packet ,JOIN_REPORT ,sizeof(JOIN_REPORT)))
+        else if(!strncmp((char*)packet ,JOIN_REPORT ,strlen(JOIN_REPORT)))
         {
             validPacket = true;
 
             hRlyr993.networkStatus = true;
+
         }
     }
     else if(isdigit(packet[packetBase]))
@@ -260,6 +272,8 @@ bool rlyr993_packet_parser(uint8_t* packet, uint8_t packet_size)
         validPacket = true;
 
         hRlyr993.temperature = atoi((char*)packet);
+
+        ESP_LOGI(TAG, "temperature is %d", (int)hRlyr993.temperature);
     }
     return validPacket;
 }
@@ -282,6 +296,29 @@ void rlyr993_get_temperature(void)
 void rlyr993_get_time(void)
 {
     rlyr993_buffer module_data = {0};
+
+    module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, LOCAL_TIME);
+
+    hRlyr993.commandSend(&module_data);
+}
+
+/**
+ * @brief Get the time
+ * 
+ */
+void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer)
+{
+    rlyr993_buffer module_data = {0};
+
+    char atCommandPacket[MAX_PACKET_SIZE] = {0};
+
+    // sprintf(atCommandPacket, "%s%s%s%s%s", 
+    //         AT, 
+    //         SEND, 
+    //         SET_VALUE, 
+    //         parameter, 
+    //         TERMINATOR);
+
 
     module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, LOCAL_TIME);
 
@@ -333,5 +370,22 @@ static uint16_t rlyr993_make_request(char* targetString, char* command)
 
     return stringLength;
 }
-
+/**
+ * @brief   Check if the module has joined lorawan network 
+ * 
+ * @return  true if joined
+ */
+bool rlyr993_joined_check(void)
+{
+    return hRlyr993.networkStatus;
+}
+/**
+ * @brief   The module has temperature sensor. This function works only if rlyr993_get_temperature is called periodically 
+ * 
+ * @return  int :   the read temperature value 
+ */
+int rlyr993_read_temperature(void)
+{
+    return hRlyr993.temperature;
+}
 /*************************************** USEFUL ELECTRONICS*****END OF FILE****/

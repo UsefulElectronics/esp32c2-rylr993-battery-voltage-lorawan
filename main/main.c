@@ -43,6 +43,7 @@ const static char *TAG = "MAIN";
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
 static void main_creatSystemTasks(void);
+static void system_change_lorawan_classA(void);
 static void system_send_to_queue(void *packetPointer);
 static void system_lorawan_callback(char rx_data);
 static void adc_handling_task(void *pvParameters);
@@ -107,6 +108,8 @@ static void system_task(void *pvParameters)
    
    for(;;)
    {
+      system_change_lorawan_classA();
+
       rlyr993_get_temperature();
 
       rlyr993_get_time();
@@ -122,6 +125,22 @@ static void system_send_to_queue(void *packetPointer)
 }
 static void system_lorawan_callback(char rx_data)
 {
+
+}
+
+static void system_change_lorawan_classA()
+{
+   static bool enableFlag = 1;
+   if(enableFlag)
+   {
+      if(rlyr993_joined_check())
+      {
+         enableFlag = false;
+
+         rlyr993_set_class();
+      }
+   }
+
 
 }
 
