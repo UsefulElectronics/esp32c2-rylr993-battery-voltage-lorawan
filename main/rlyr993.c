@@ -312,12 +312,14 @@ void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer)
 
     char atCommandPacket[MAX_PACKET_SIZE] = {0};
 
-    // sprintf(atCommandPacket, "%s%s%s%s%s", 
-    //         AT, 
-    //         SEND, 
-    //         SET_VALUE, 
-    //         parameter, 
-    //         TERMINATOR);
+    sprintf(atCommandPacket, "%s%s%s%d:%d:%s", 
+            AT, 
+            SEND, 
+            SET_VALUE, 
+            (int)lorawanPort, 
+            (int)ack, 
+            dataBuffer, 
+            TERMINATOR);
 
 
     module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, LOCAL_TIME);
