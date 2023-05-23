@@ -43,7 +43,7 @@ const static char *TAG = "MAIN";
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
 static void main_creatSystemTasks(void);
-static void system_change_lorawan_classA(void);
+static bool system_change_lorawan_classA(void);
 static void system_send_to_queue(void *packetPointer);
 static void system_lorawan_callback(char rx_data);
 static void adc_handling_task(void *pvParameters);
@@ -103,16 +103,23 @@ static void adc_handling_task(void *pvParameters)
 
 static void system_task(void *pvParameters)
 {
-   const uint16_t task_period = 5000; //ms
+   const uint16_t task_period = 30000; //ms
 
-   
+   static uint8_t networkJoined = 0;
+
+   uint8_t dataBuffer[2] = {0x13, 0x22};
    for(;;)
    {
-      system_change_lorawan_classA();
+      networkJoined = !system_change_lorawan_classA();
 
       rlyr993_get_temperature();
 
       rlyr993_get_time();
+
+      if(networkJoined)
+      {
+         rlyr993_send_data(1, 0, dataBuffer, 2);
+      }
 
       vTaskDelay(task_period/portTICK_PERIOD_MS);
    }
@@ -128,7 +135,7 @@ static void system_lorawan_callback(char rx_data)
 
 }
 
-static void system_change_lorawan_classA()
+static bool system_change_lorawan_classA()
 {
    static bool enableFlag = 1;
    if(enableFlag)
@@ -141,6 +148,7 @@ static void system_change_lorawan_classA()
       }
    }
 
+   return enableFlag;
 
 }
 

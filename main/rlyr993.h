@@ -143,6 +143,16 @@ void rlyr993_get_temperature(void);
  */
 void rlyr993_get_time(void);
 /**
+ * @brief   Create send data packet to be sent over LoRaWAN
+ * 
+ * @param   lorawanPort :   server port number to send the packet over 
+ * 
+ * @param   ack         :   Acknowledgment required enable flag 
+ * 
+ * @param   dataBuffer  :   Data content to be sent
+ */
+void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, uint8_t dataSize);
+/**
  * @brief LoRaWAN join request with OTAA method 
  * 
  */

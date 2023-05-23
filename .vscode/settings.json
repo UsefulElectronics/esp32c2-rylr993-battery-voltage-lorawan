@@ -24,7 +24,8 @@
         "utility": "c",
         "adc_config.h": "c",
         "stdio.h": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "string": "c"
     },
     "idf.flashType": "UART",
     "idf.port": "/dev/ttyUSB0",

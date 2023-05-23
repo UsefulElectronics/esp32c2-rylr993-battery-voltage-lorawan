@@ -61,9 +61,10 @@ const static char *TAG = "RYLR";
 /* MACROS --------------------------------------------------------------------*/
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
-static uint16_t rlyr993_make_command(char* targetString, char* command, char* parameter);
-static uint16_t rlyr993_make_request(char* targetString, char* command);
-static bool     rlyr993_packet_parser(uint8_t* packet);
+static uint16_t rlyr993_make_command    (char* targetString, char* command, char* parameter);
+static uint16_t rlyr993_make_request    (char* targetString, char* command);
+static bool     rlyr993_packet_parser   (uint8_t* packet);
+static char *   rlyr993_raw2hex         (uint8_t* dataBuffer, uint8_t dataSize);
 /* FUNCTION PROTOTYPES -------------------------------------------------------*/
 /**
  * @brief   Initialize LoRaWAN module driver that will send AT commands and callback a function when receiving data
@@ -87,10 +88,6 @@ void rlyr993_init(void* tx_function, void* rx_callback)
     rlyr993_set_networkId();
 
     rlyr993_set_appkey();
-
-    // rlyr993_set_class();
-
-    //rlyr993_set_mode(LORAWAN);
 
     rlyr993_join_request();
     
@@ -301,30 +298,63 @@ void rlyr993_get_time(void)
 
     hRlyr993.commandSend(&module_data);
 }
-
 /**
- * @brief Get the time
+ * @brief   Converts a packet of data to a hexadecimal string representation.
+ *
+ *          This function takes an array of unsigned characters representing a packet of data and converts it to a hexadecimal string representation.
+ *
+ * @param   data    : The packet of data to be converted.
  * 
+ * @param   length  : The length of the packet in bytes.
+
+ * @return  char*   : Pointer to the formed string
  */
-void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer)
+static char * rlyr993_raw2hex(uint8_t* dataBuffer, uint8_t dataSize)
+{
+    char *hexString = (char *)malloc((dataSize * 2 + 1) * sizeof(char));
+
+    for (size_t i = 0; i < dataSize; i++) 
+    {
+        sprintf(hexString + (i * 2), "%02X", dataBuffer[i]);
+    }
+    return hexString;
+}
+/**
+ * @brief   Create send data packet to be sent over LoRaWAN
+ * 
+ * @param   lorawanPort :   server port number to send the packet over 
+ * 
+ * @param   ack         :   Acknowledgment required enable flag 
+ * 
+ * @param   dataBuffer  :   Data content to be sent
+ * 
+ * @param   dataSize    :   Data content size
+ */
+void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, uint8_t dataSize)
 {
     rlyr993_buffer module_data = {0};
 
+    char* dataString = rlyr993_raw2hex(dataBuffer, dataSize);
+
     char atCommandPacket[MAX_PACKET_SIZE] = {0};
 
-    sprintf(atCommandPacket, "%s%s%s%d:%d:%s", 
+    sprintf(atCommandPacket, "%s%s%s%d:%d:%s%s", 
             AT, 
             SEND, 
             SET_VALUE, 
             (int)lorawanPort, 
             (int)ack, 
-            dataBuffer, 
+            dataString, 
             TERMINATOR);
 
 
-    module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, LOCAL_TIME);
+    module_data.txPacketSize = strlen(atCommandPacket);
+
+    memcpy(module_data.txPacket, atCommandPacket, module_data.txPacketSize);
 
     hRlyr993.commandSend(&module_data);
+
+    free(dataString);
 }
 /**
  * @brief   Construct AT command using the passed parameters to be sent to the module.
