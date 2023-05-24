@@ -33,10 +33,16 @@
 /* INCLUDES ------------------------------------------------------------------*/
 #include "main.h"
 
-/* PRIVATE STRUCTRES ---------------------------------------------------------*/
+/* PRIVATE STRUCTURES ---------------------------------------------------------*/
+typedef struct 
+{
+   uint16_t batteryVoltage;
+   uint8_t  temperature;
 
+}system_param_t;
 /* VARIABLES -----------------------------------------------------------------*/
 const static char *TAG = "MAIN";
+system_param_t systemParam = {0};
 /* DEFINITIONS ---------------------------------------------------------------*/
 
 /* MACROS --------------------------------------------------------------------*/
@@ -95,7 +101,7 @@ static void adc_handling_task(void *pvParameters)
    const float voltage_divider = (ADC_VOLTAGE_DIV_R1 + ADC_VOLTAGE_DIV_R2) / (ADC_VOLTAGE_DIV_R2 + 0.0);
    for(;;)
    {
-      adc_read_voltage(voltage_divider);
+      systemParam.batteryVoltage = adc_read_voltage(voltage_divider);
 
       vTaskDelay(task_period/portTICK_PERIOD_MS);
    }
@@ -118,7 +124,9 @@ static void system_task(void *pvParameters)
 
       if(networkJoined)
       {
-         rlyr993_send_data(1, 0, dataBuffer, 2);
+         rlyr993_send_data(1, 0, systemParam.batteryVoltage, 2);
+
+         rlyr993_send_data(1, 0, systemParam.temperature, 1);
       }
 
       vTaskDelay(task_period/portTICK_PERIOD_MS);

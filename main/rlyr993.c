@@ -232,15 +232,15 @@ static bool rlyr993_packet_parser(uint8_t* packet)
 {
     bool validPacket = false;
 
-    const uint8_t packetBase = 0; 
+    const uint8_t packetBase = 0;
+    
+    rlyr993_buffer module_data = {0};
+    
     //Offset buffer if it starts with space character 
     if(packet[packetBase] == SPACE)
     {
         ++packet;
     }
-    // packet = (packet[packetBase] == SPACE) ? (packet + 1) : packet;
-
-    
     //Module report packet check
     if(!strncmp((char*)packet ,MSG_REPORT ,strlen(MSG_REPORT)))
     {
@@ -248,11 +248,15 @@ static bool rlyr993_packet_parser(uint8_t* packet)
         //report header ignore 
         packet = packet + strlen(MSG_REPORT) ;
 
-        ESP_LOGI(TAG, "%s", packet);
+        // ESP_LOGI(TAG, "%s", packet);
 
+        if(isdigit(packet[packetBase]))
+        {
+            sscanf(packet, "%d:%d:%s", NULL, &module_data.rxPacketSize, module_data.rxPacket);
+        }
         if(!strncmp((char*)packet ,PARAM_REPORT ,strlen(PARAM_REPORT)))
         {
-            sscanf((char*)packet, "RX_1, DR %d, RSSI %d, SNR %d", &hRlyr993.rssi, &hRlyr993.rssi, &hRlyr993.snr);
+            sscanf((char*)packet, "RX_1, DR %d, RSSI %d, SNR %d", &hRlyr993.dr, &hRlyr993.rssi, &hRlyr993.snr);
 
             validPacket = true;
         }
