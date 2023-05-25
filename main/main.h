@@ -20,7 +20,7 @@
 /* INCLUDES ------------------------------------------------------------------*/
 #include "uart_config.h"
 #include "adc_config.h"
-#include "rlyr993.h"
+#include "rylr993.h"
 /* MACROS --------------------------------------------------------------------*/
 #define ADC_VOLTAGE_DIV_R1          820//KOhm
 #define ADC_VOLTAGE_DIV_R2          1000//KOhm

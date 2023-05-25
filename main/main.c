@@ -51,7 +51,7 @@ system_param_t systemParam = {0};
 static void main_creatSystemTasks(void);
 static bool system_change_lorawan_classA(void);
 static void system_send_to_queue(void *packetPointer);
-static void system_lorawan_callback(char rx_data);
+static void system_lorawan_callback(void* rx_data, uint8_t packetId);
 static void adc_handling_task(void *pvParameters);
 static void uart_reception_task(void *pvParameters);
 static void system_task(void *pvParameters);
@@ -62,7 +62,7 @@ void app_main(void)
 
    adc_config();
 
-   rlyr993_init(system_send_to_queue, system_lorawan_callback);
+   rylr993_init(system_send_to_queue, system_lorawan_callback);
 
    main_creatSystemTasks();
 
@@ -90,7 +90,7 @@ static void uart_reception_task(void *pvParameters)
       //Waiting for UART packet to get received.
       if(xQueueReceive(uartRxStore_queue, (void * )&uartHandler, portMAX_DELAY))
       {
-         rlyr993_packet_separator(uartHandler.uart_rxBuffer, uartHandler.uart_rxPacketSize);
+         rylr993_packet_separator(uartHandler.uart_rxBuffer, uartHandler.uart_rxPacketSize);
       }
    }
 }
@@ -118,15 +118,15 @@ static void system_task(void *pvParameters)
    {
       networkJoined = !system_change_lorawan_classA();
 
-      rlyr993_get_temperature();
+      rylr993_get_temperature();
 
-      rlyr993_get_time();
+      rylr993_get_time();
 
       if(networkJoined)
       {
-         rlyr993_send_data(1, 0, systemParam.batteryVoltage, 2);
+         rylr993_send_data(1, 0, &systemParam.batteryVoltage, 2);
 
-         rlyr993_send_data(1, 0, systemParam.temperature, 1);
+         rylr993_send_data(1, 0, &systemParam.temperature, 1);
       }
 
       vTaskDelay(task_period/portTICK_PERIOD_MS);
@@ -138,9 +138,22 @@ static void system_send_to_queue(void *packetPointer)
 {
    xQueueSendToBack(uartTx_queue, packetPointer, portMAX_DELAY);
 }
-static void system_lorawan_callback(char rx_data)
+static void system_lorawan_callback(void* rx_data, uint8_t packetId)
 {
+   uartHandler_t packetHandler = {0};
 
+   switch (packetId)
+   {
+      case RYLR993_TEMPERATURE:
+         systemParam.temperature = rylr993_read_temperature();
+         break;
+      case RYLR993_PIN_CONTROL:
+         memcpy(&packetHandler, rx_data, sizeof(uartHandler_t));
+         break;
+      
+      default:
+         break;
+   }
 }
 
 static bool system_change_lorawan_classA()
@@ -148,11 +161,11 @@ static bool system_change_lorawan_classA()
    static bool enableFlag = 1;
    if(enableFlag)
    {
-      if(rlyr993_joined_check())
+      if(rylr993_joined_check())
       {
          enableFlag = false;
 
-         rlyr993_set_class();
+         rylr993_set_class();
       }
    }
 

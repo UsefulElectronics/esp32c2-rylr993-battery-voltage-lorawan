@@ -4,7 +4,7 @@
  ******************************************************************************/
 /**
  ******************************************************************************
- * @file    :  rlyr993.c
+ * @file    :  rylr993.c
  * @author  :  WARD ALMASARANI
  * @version :  v.1.0
  * @date    :  May 14, 2023
@@ -15,24 +15,28 @@
 
 
 /* INCLUDES ------------------------------------------------------------------*/
-#include "rlyr993.h"
+#include "rylr993.h"
 #include "esp_log.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
+
 /* PRIVATE STRUCTURES --------------------------------------------------------*/
 typedef struct 
 {
     void    (*commandSend)     (void *tx_buffer);
-    void    (*receiveCallback) (void);
+    void    (*receiveCallback) (void* rx_packet, packet_id_e packet_id);
     bool     networkStatus;
     int32_t  temperature;
     int  rssi;
     int  snr;
     int  dr;
     
-}rlyr993_handler;
+}rylr993_handler;
 typedef struct 
 {
     char rxPacket[RLYR993_MAX_PACK_SIZE];
@@ -49,22 +53,23 @@ typedef struct
 		}flags;
 	}status;
 
-}rlyr993_buffer;
+}rylr993_buffer;
 
 
 /* VARIABLES -----------------------------------------------------------------*/
-rlyr993_handler hRlyr993 = {0};
+rylr993_handler hRlyr993 = {0};
 char packetHolder[MAX_PPACKETS][MAX_PACKET_SIZE] = {0};
 const static char *TAG = "RYLR";
+QueueHandle_t rlyr993_packet_queue;
 /* DEFINITIONS ---------------------------------------------------------------*/
 
 /* MACROS --------------------------------------------------------------------*/
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
-static uint16_t rlyr993_make_command    (char* targetString, char* command, char* parameter);
-static uint16_t rlyr993_make_request    (char* targetString, char* command);
-static bool     rlyr993_packet_parser   (uint8_t* packet);
-static char *   rlyr993_raw2hex         (uint8_t* dataBuffer, uint8_t dataSize);
+static uint16_t rylr993_make_command    (char* targetString, char* command, char* parameter);
+static uint16_t rylr993_make_request    (char* targetString, char* command);
+static bool     rylr993_packet_parser   (uint8_t* packet);
+static char *   rylr993_raw2hex         (uint8_t* dataBuffer, uint8_t dataSize);
 /* FUNCTION PROTOTYPES -------------------------------------------------------*/
 /**
  * @brief   Initialize LoRaWAN module driver that will send AT commands and callback a function when receiving data
@@ -73,34 +78,36 @@ static char *   rlyr993_raw2hex         (uint8_t* dataBuffer, uint8_t dataSize);
  * 
  * @param   rx_callback     :   Higher layer reception callback pointer. 
  */
-void rlyr993_init(void* tx_function, void* rx_callback)
+void rylr993_init(void* tx_function, void* rx_callback)
 {
-    hRlyr993.commandSend = tx_function;
+    rlyr993_packet_queue        = xQueueCreate(10, sizeof(rylr993_buffer));
 
-    hRlyr993.receiveCallback = rx_callback;
+    hRlyr993.commandSend        = tx_function;
 
-    rlyr993_set_band();
+    hRlyr993.receiveCallback    = rx_callback;
 
-    rlyr993_set_deveui();
+    rylr993_set_band();
 
-    rlyr993_set_appeui();
+    rylr993_set_deveui();
 
-    rlyr993_set_networkId();
+    rylr993_set_appeui();
 
-    rlyr993_set_appkey();
+    rylr993_set_networkId();
 
-    rlyr993_join_request();
+    rylr993_set_appkey();
+
+    rylr993_join_request();
     
 }
 /**
  * @brief Set LoRaWAN device unique ID
  * 
  */
-void rlyr993_set_deveui(void)
+void rylr993_set_deveui(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, DEVEUI, OTAA_DEVEUI);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, DEVEUI, OTAA_DEVEUI);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -108,11 +115,11 @@ void rlyr993_set_deveui(void)
  * @brief Set LoRaWAN application unique ID
  * 
  */
-void rlyr993_set_appeui(void)
+void rylr993_set_appeui(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, APPEUI, OTAA_APPEUI);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, APPEUI, OTAA_APPEUI);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -120,11 +127,11 @@ void rlyr993_set_appeui(void)
  * @brief Set LoRaWAN network unique ID
  * 
  */
-void rlyr993_set_networkId(void)
+void rylr993_set_networkId(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, NWKKEY, OTAA_APPKEY);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, NWKKEY, OTAA_APPKEY);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -132,11 +139,11 @@ void rlyr993_set_networkId(void)
  * @brief Set LoRaWAN application key ID
  * 
  */
-void rlyr993_set_appkey(void)
+void rylr993_set_appkey(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, APPKEY, OTAA_APPKEY);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, APPKEY, OTAA_APPKEY);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -145,11 +152,11 @@ void rlyr993_set_appkey(void)
  * @brief Set LoRaWAN communication EU868 band
  * 
  */
-void rlyr993_set_band(void)
+void rylr993_set_band(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, BAND, OTAA_BAND_EU868);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, BAND, OTAA_BAND_EU868);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -157,11 +164,11 @@ void rlyr993_set_band(void)
  * @brief Set Module communication mode whether it is peer to peer or LoRaWAN
  * 
  */
-void rlyr993_set_mode(char* mode)
+void rylr993_set_mode(char* mode)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, MODE, mode);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, MODE, mode);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -169,11 +176,11 @@ void rlyr993_set_mode(char* mode)
  * @brief Set LoRaWAN class A
  * 
  */
-void rlyr993_set_class(void)
+void rylr993_set_class(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, CLASS, CLASS_A);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, CLASS, CLASS_A);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -181,11 +188,11 @@ void rlyr993_set_class(void)
  * @brief LoRaWAN join request with OTAA method 
  * 
  */
-void rlyr993_join_request(void)
+void rylr993_join_request(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_command(module_data.txPacket, JOIN, OTAA);
+    module_data.txPacketSize = rylr993_make_command(module_data.txPacket, JOIN, OTAA);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -198,17 +205,17 @@ void rlyr993_join_request(void)
  * 
  * @return  bool        :   true if packet is valid 
  */
-bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size)
+bool rylr993_packet_separator(uint8_t* packet, uint8_t packet_size)
 {
     bool validPacket = false;
 
-    //  char token[MAX_PACKET_SIZE] = {0};
+    rylr993_buffer module_data = {0};
 
     uint8_t packetCounter = 0;
 
     uint8_t charCounter = 0;
 
-    // ESP_LOGI(TAG, "%s", packet);
+    const uint8_t dontWait = 0;
 
     char *pToken = strtok((char *)packet, "\r\n");
 
@@ -219,22 +226,34 @@ bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size)
 
         ++packetCounter;
 
-        rlyr993_packet_parser((uint8_t*)pToken);
+        rylr993_packet_parser((uint8_t*)pToken);
         
         pToken = strtok(NULL, "\r\n");
 
         // ESP_LOGI(TAG, "%s", packetHolder[packetCounter]);
     }
+    if(RYLR993_JOINED == rylr993_joined_check())
+    {
+        if(xQueueReceive(rlyr993_packet_queue, (void * )&module_data, dontWait))
+        {
+            hRlyr993.commandSend(&module_data);
+
+            hRlyr993.networkStatus = RYLR993_BUSY;
+        }
+    }
+
 
     return validPacket;
 }
-static bool rlyr993_packet_parser(uint8_t* packet)
+static bool rylr993_packet_parser(uint8_t* packet)
 {
     bool validPacket = false;
 
+    int* unused = NULL;
+
     const uint8_t packetBase = 0;
     
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
     
     //Offset buffer if it starts with space character 
     if(packet[packetBase] == SPACE)
@@ -252,7 +271,9 @@ static bool rlyr993_packet_parser(uint8_t* packet)
 
         if(isdigit(packet[packetBase]))
         {
-            sscanf(packet, "%d:%d:%s", NULL, &module_data.rxPacketSize, module_data.rxPacket);
+            sscanf((char*)packet, "%d:%d:%s", unused, (int*)&module_data.rxPacketSize, module_data.rxPacket);
+
+            hRlyr993.receiveCallback(module_data.rxPacket, RYLR993_PIN_CONTROL);
         }
         if(!strncmp((char*)packet ,PARAM_REPORT ,strlen(PARAM_REPORT)))
         {
@@ -264,7 +285,7 @@ static bool rlyr993_packet_parser(uint8_t* packet)
         {
             validPacket = true;
 
-            hRlyr993.networkStatus = true;
+            hRlyr993.networkStatus = RYLR993_JOINED;
 
         }
     }
@@ -274,6 +295,8 @@ static bool rlyr993_packet_parser(uint8_t* packet)
 
         hRlyr993.temperature = atoi((char*)packet);
 
+        hRlyr993.receiveCallback(NULL, RYLR993_TEMPERATURE);
+
         ESP_LOGI(TAG, "temperature is %d", (int)hRlyr993.temperature);
     }
     return validPacket;
@@ -282,11 +305,11 @@ static bool rlyr993_packet_parser(uint8_t* packet)
  * @brief Get the scrounging temperature from the module internal sensor
  * 
  */
-void rlyr993_get_temperature(void)
+void rylr993_get_temperature(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, TEMPERATURE);
+    module_data.txPacketSize = rylr993_make_request(module_data.txPacket, TEMPERATURE);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -294,11 +317,11 @@ void rlyr993_get_temperature(void)
  * @brief Get the time
  * 
  */
-void rlyr993_get_time(void)
+void rylr993_get_time(void)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    module_data.txPacketSize = rlyr993_make_request(module_data.txPacket, LOCAL_TIME);
+    module_data.txPacketSize = rylr993_make_request(module_data.txPacket, LOCAL_TIME);
 
     hRlyr993.commandSend(&module_data);
 }
@@ -313,7 +336,7 @@ void rlyr993_get_time(void)
 
  * @return  char*   : Pointer to the formed string
  */
-static char * rlyr993_raw2hex(uint8_t* dataBuffer, uint8_t dataSize)
+static char * rylr993_raw2hex(uint8_t* dataBuffer, uint8_t dataSize)
 {
     char *hexString = (char *)malloc((dataSize * 2 + 1) * sizeof(char));
 
@@ -334,11 +357,11 @@ static char * rlyr993_raw2hex(uint8_t* dataBuffer, uint8_t dataSize)
  * 
  * @param   dataSize    :   Data content size
  */
-void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, uint8_t dataSize)
+void rylr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, uint8_t dataSize)
 {
-    rlyr993_buffer module_data = {0};
+    rylr993_buffer module_data = {0};
 
-    char* dataString = rlyr993_raw2hex(dataBuffer, dataSize);
+    char* dataString = rylr993_raw2hex(dataBuffer, dataSize);
 
     char atCommandPacket[MAX_PACKET_SIZE] = {0};
 
@@ -356,7 +379,9 @@ void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, ui
 
     memcpy(module_data.txPacket, atCommandPacket, module_data.txPacketSize);
 
-    hRlyr993.commandSend(&module_data);
+    xQueueSendToBack(rlyr993_packet_queue, &module_data, portMAX_DELAY);
+    
+    // hRlyr993.commandSend(&module_data);
 
     free(dataString);
 }
@@ -369,7 +394,7 @@ void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, ui
  * 
  * @return  uint16_t    :   The size of the constructed command length.
  */
-static uint16_t rlyr993_make_command(char* targetString, char* command, char* parameter)
+static uint16_t rylr993_make_command(char* targetString, char* command, char* parameter)
 {
     uint16_t stringLength = 0;
 
@@ -392,7 +417,7 @@ static uint16_t rlyr993_make_command(char* targetString, char* command, char* pa
  * 
  * @return  uint16_t    :   The size of the constructed command length.
  */
-static uint16_t rlyr993_make_request(char* targetString, char* command)
+static uint16_t rylr993_make_request(char* targetString, char* command)
 {
     uint16_t stringLength = 0;
 
@@ -411,16 +436,16 @@ static uint16_t rlyr993_make_request(char* targetString, char* command)
  * 
  * @return  true if joined
  */
-bool rlyr993_joined_check(void)
+bool rylr993_joined_check(void)
 {
     return hRlyr993.networkStatus;
 }
 /**
- * @brief   The module has temperature sensor. This function works only if rlyr993_get_temperature is called periodically 
+ * @brief   The module has temperature sensor. This function works only if rylr993_get_temperature is called periodically 
  * 
  * @return  int :   the read temperature value 
  */
-int rlyr993_read_temperature(void)
+int rylr993_read_temperature(void)
 {
     return hRlyr993.temperature;
 }

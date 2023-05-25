@@ -4,7 +4,7 @@
  ******************************************************************************/
 /**
  ******************************************************************************
- * @file    :  rlyr993.h
+ * @file    :  rylr993.h
  * @author  :  WARD ALMASARANI
  * @version :  v.1.0
  * @date    :  May 13, 2023
@@ -13,8 +13,8 @@
 			   Useful Electronics YouTube channel	
  ******************************************************************************/
 
-#ifndef MAIN_RLYR993_H_
-#define MAIN_RLYR993_H_
+#ifndef MAIN_RYLR993_H_
+#define MAIN_RYLR993_H_
 
 
 /* INCLUDES ------------------------------------------------------------------*/
@@ -87,8 +87,20 @@
 
 #define MAX_PPACKETS			5
 #define MAX_PACKET_SIZE			100
-/* ENUMORATIONS --------------------------------------------------------------*/
 
+/* ENUMERATIONS --------------------------------------------------------------*/
+typedef enum
+{
+	RYLR993_TEMPERATURE = 0,
+	RYLR993_PIN_CONTROL
+}packet_id_e;
+
+typedef enum
+{
+	RYLR993_IDLE = 0,
+	RYLR993_JOINED,
+	RYLR993_BUSY,
+}module_status_e;
 /* STRUCTURES & TYPEDEFS -----------------------------------------------------*/
 
 /* VARIABLES -----------------------------------------------------------------*/
@@ -98,7 +110,7 @@
  * @brief Set LoRaWAN device unique ID
  * 
  */
-void rlyr993_set_deveui(void);
+void rylr993_set_deveui(void);
 /**
  * @brief   Initialize LoRaWAN module driver that will send AT commands and callback a function when receiving data
  * 
@@ -106,42 +118,42 @@ void rlyr993_set_deveui(void);
  * 
  * @param   rx_callback     :   Higher layer reception callback pointer. 
  */
-void rlyr993_init(void* tx_function, void* rx_callback);
+void rylr993_init(void* tx_function, void* rx_callback);
 /**
  * @brief Set LoRaWAN class A
  * 
  */
-void rlyr993_set_class(void);
+void rylr993_set_class(void);
 /**
  * @brief Set LoRaWAN communication EU868 band
  * 
  */
-void rlyr993_set_band(void);
+void rylr993_set_band(void);
 /**
  * @brief Set LoRaWAN application key ID
  * 
  */
-void rlyr993_set_appkey(void);
+void rylr993_set_appkey(void);
 /**
  * @brief Set LoRaWAN application unique ID
  * 
  */
-void rlyr993_set_appeui(void);
+void rylr993_set_appeui(void);
 /**
  * @brief Set LoRaWAN network unique ID
  * 
  */
-void rlyr993_set_networkId(void);
+void rylr993_set_networkId(void);
 /**
  * @brief Get the scrounging temperature from the module internal sensor
  * 
  */
-void rlyr993_get_temperature(void);
+void rylr993_get_temperature(void);
 /**
  * @brief Get time
  * 
  */
-void rlyr993_get_time(void);
+void rylr993_get_time(void);
 /**
  * @brief   Create send data packet to be sent over LoRaWAN
  * 
@@ -151,12 +163,12 @@ void rlyr993_get_time(void);
  * 
  * @param   dataBuffer  :   Data content to be sent
  */
-void rlyr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, uint8_t dataSize);
+void rylr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, uint8_t dataSize);
 /**
  * @brief LoRaWAN join request with OTAA method 
  * 
  */
-void rlyr993_join_request(void);
+void rylr993_join_request(void);
 /**
  * @brief 	Separates the packet received from the LoRaWAN module 
  * 
@@ -166,24 +178,24 @@ void rlyr993_join_request(void);
  * 
  * @return  bool        :   true if packet is valid 
  */
-bool rlyr993_packet_separator(uint8_t* packet, uint8_t packet_size);
+bool rylr993_packet_separator(uint8_t* packet, uint8_t packet_size);
 /**
  * @brief Set Module communication mode whether it is peer to peer or LoRaWAN
  * 
  */
-void rlyr993_set_mode(char* mode);
+void rylr993_set_mode(char* mode);
 /**
  * @brief   Check if the module has joined lorawan network 
  * 
  * @return  true if joined
  */
-bool rlyr993_joined_check(void);
+bool rylr993_joined_check(void);
 /**
- * @brief   The module has temperature sensor. This function works only if rlyr993_get_temperature is called periodically 
+ * @brief   The module has temperature sensor. This function works only if rylr993_get_temperature is called periodically 
  * 
  * @return  int :   the read temperature value 
  */
-int rlyr993_read_temperature(void);
+int rylr993_read_temperature(void);
 #endif /* MAIN_TRLYR993_H_ */
 
 /*************************************** USEFUL ELECTRONICS*****END OF FILE****/
