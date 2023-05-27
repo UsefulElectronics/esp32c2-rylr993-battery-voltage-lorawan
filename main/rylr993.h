@@ -187,15 +187,26 @@ void rylr993_set_mode(char* mode);
 /**
  * @brief   Check if the module has joined lorawan network 
  * 
- * @return  true if joined
+ * @return  module operation status 
  */
-bool rylr993_joined_check(void);
+module_status_e rylr993_joined_check(void);
 /**
  * @brief   The module has temperature sensor. This function works only if rylr993_get_temperature is called periodically 
  * 
  * @return  int :   the read temperature value 
  */
 int rylr993_read_temperature(void);
+/**
+ * @brief Make module available for sending data
+ * 
+ */
+void rylr993_make_available(void);
+/**
+ * @brief   Counter function is used to updated module network status.
+ * 
+ * @param   taskPeriod :    Task period that is running this function.
+ */
+void rylr993_status_counter(uint16_t taskPeriod);
 #endif /* MAIN_TRLYR993_H_ */
 
 /*************************************** USEFUL ELECTRONICS*****END OF FILE****/

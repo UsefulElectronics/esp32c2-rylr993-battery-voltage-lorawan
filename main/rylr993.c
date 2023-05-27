@@ -28,10 +28,11 @@
 /* PRIVATE STRUCTURES --------------------------------------------------------*/
 typedef struct 
 {
-    void    (*commandSend)     (void *tx_buffer);
-    void    (*receiveCallback) (void* rx_packet, packet_id_e packet_id);
-    bool     networkStatus;
-    int32_t  temperature;
+    void                (*commandSend)     (void *tx_buffer);
+    void                (*receiveCallback) (void* rx_packet, packet_id_e packet_id);
+    module_status_e     networkStatus;
+    int32_t             temperature;
+    uint8_t             timer;
     int  rssi;
     int  snr;
     int  dr;
@@ -219,7 +220,6 @@ bool rylr993_packet_separator(uint8_t* packet, uint8_t packet_size)
 
     char *pToken = strtok((char *)packet, "\r\n");
 
-
     while(pToken != NULL)
     {
         strcpy(packetHolder[packetCounter], pToken);
@@ -232,6 +232,7 @@ bool rylr993_packet_separator(uint8_t* packet, uint8_t packet_size)
 
         // ESP_LOGI(TAG, "%s", packetHolder[packetCounter]);
     }
+
     if(RYLR993_JOINED == rylr993_joined_check())
     {
         if(xQueueReceive(rlyr993_packet_queue, (void * )&module_data, dontWait))
@@ -280,6 +281,9 @@ static bool rylr993_packet_parser(uint8_t* packet)
             sscanf((char*)packet, "RX_1, DR %d, RSSI %d, SNR %d", &hRlyr993.dr, &hRlyr993.rssi, &hRlyr993.snr);
 
             validPacket = true;
+
+            hRlyr993.networkStatus = RYLR993_JOINED;
+
         }
         else if(!strncmp((char*)packet ,JOIN_REPORT ,strlen(JOIN_REPORT)))
         {
@@ -381,6 +385,7 @@ void rylr993_send_data(uint8_t lorawanPort, uint8_t ack, uint8_t* dataBuffer, ui
 
     xQueueSendToBack(rlyr993_packet_queue, &module_data, portMAX_DELAY);
     
+    // hRlyr993.networkStatus = RYLR993_BUSY;
     // hRlyr993.commandSend(&module_data);
 
     free(dataString);
@@ -436,9 +441,17 @@ static uint16_t rylr993_make_request(char* targetString, char* command)
  * 
  * @return  true if joined
  */
-bool rylr993_joined_check(void)
+module_status_e rylr993_joined_check(void)
 {
     return hRlyr993.networkStatus;
+}
+/**
+ * @brief Make module available for sending data
+ * 
+ */
+void rylr993_make_available(void)
+{
+    hRlyr993.networkStatus = RYLR993_JOINED;
 }
 /**
  * @brief   The module has temperature sensor. This function works only if rylr993_get_temperature is called periodically 
@@ -448,5 +461,44 @@ bool rylr993_joined_check(void)
 int rylr993_read_temperature(void)
 {
     return hRlyr993.temperature;
+}
+/**
+ * @brief   Counter function is used to updated module network status.
+ * 
+ * @param   taskPeriod :    Task period that is running this function.
+ */
+void rylr993_status_counter(uint16_t taskPeriod)
+{
+    //seconds
+    const uint8_t timeout = 10; 
+    //convert to seconds
+    uint16_t counterStep = taskPeriod / 1000; 
+
+    rylr993_buffer module_data = {0};
+
+    if(RYLR993_BUSY == hRlyr993.networkStatus)
+    {
+        hRlyr993.timer += counterStep;
+
+        if(hRlyr993.timer > timeout)
+        {
+            hRlyr993.timer = 0;
+
+            rylr993_make_available();
+
+            if(xQueueReceive(rlyr993_packet_queue, (void * )&module_data, 0))
+            {
+                hRlyr993.commandSend(&module_data);
+
+                hRlyr993.networkStatus = RYLR993_BUSY;
+            }
+        }
+    }
+    else
+    {
+        hRlyr993.timer = 0;
+    }
+
+
 }
 /*************************************** USEFUL ELECTRONICS*****END OF FILE****/

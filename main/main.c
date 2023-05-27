@@ -103,6 +103,8 @@ static void adc_handling_task(void *pvParameters)
    {
       systemParam.batteryVoltage = adc_read_voltage(voltage_divider);
 
+      rylr993_status_counter(task_period);
+
       vTaskDelay(task_period/portTICK_PERIOD_MS);
    }
 }
@@ -113,7 +115,6 @@ static void system_task(void *pvParameters)
 
    static uint8_t networkJoined = 0;
 
-   uint8_t dataBuffer[2] = {0x13, 0x22};
    for(;;)
    {
       networkJoined = !system_change_lorawan_classA();
