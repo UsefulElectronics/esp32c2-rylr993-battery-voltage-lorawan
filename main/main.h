@@ -18,8 +18,17 @@
 
 
 /* INCLUDES ------------------------------------------------------------------*/
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_log.h"
+#include "driver/uart.h"
+#include "string.h"
+
+
 #include "uart_config.h"
 #include "adc_config.h"
+#include "gpio_config.h"
 #include "rylr993.h"
 /* MACROS --------------------------------------------------------------------*/
 #define ADC_VOLTAGE_DIV_R1          820//KOhm

@@ -60,7 +60,7 @@ uint16_t adc_read_voltage(float voltage_divider_ration)
 
     ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw));
 
-    ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN0, adc_raw);
+    // ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN0, adc_raw);
 
     if (do_calibration) 
     {
@@ -68,10 +68,10 @@ uint16_t adc_read_voltage(float voltage_divider_ration)
 
             adc_voltege = voltage_divider_ration * adc_voltege;
 
-        ESP_LOGI(TAG, "Vd%f ADC%d Channel[%d] Cali Voltage: %d mV",voltage_divider_ration, ADC_UNIT_1 + 1, ADC1_CHAN0, adc_voltege);
+        // ESP_LOGI(TAG, "Vd%f ADC%d Channel[%d] Cali Voltage: %d mV",voltage_divider_ration, ADC_UNIT_1 + 1, ADC1_CHAN0, adc_voltege);
     }
 
-    return (uint16_t)adc_voltege ;
+    return (uint16_t)adc_voltege;
 }
 
 static bool adc_calibration_init(adc_unit_t unit, adc_atten_t atten, adc_cali_handle_t *out_handle)

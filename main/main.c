@@ -6,13 +6,8 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/uart.h"
-#include "string.h"
-#include "driver/gpio.h"
+
+
 
 /**
  ******************************************************************************
@@ -44,14 +39,14 @@ typedef struct
 const static char *TAG = "MAIN";
 system_param_t systemParam = {0};
 /* DEFINITIONS ---------------------------------------------------------------*/
-
+#define GPIO_CONTROL_PACKET_SIZE    30
 /* MACROS --------------------------------------------------------------------*/
 
 /* PRIVATE FUNCTIONS DECLARATION ---------------------------------------------*/
 static void main_creatSystemTasks(void);
 static bool system_change_lorawan_classA(void);
 static void system_send_to_queue(void *packetPointer);
-static void system_lorawan_callback(void* rx_data, uint8_t packetId);
+static void system_lorawan_callback(uint8_t* rx_data, uint8_t packetId);
 static void adc_handling_task(void *pvParameters);
 static void uart_reception_task(void *pvParameters);
 static void system_task(void *pvParameters);
@@ -63,6 +58,8 @@ void app_main(void)
    adc_config();
 
    rylr993_init(system_send_to_queue, system_lorawan_callback);
+
+   gpio_pin_configure(GPIO_NUM_3, GPIO_MODE_OUTPUT);
 
    main_creatSystemTasks();
 
@@ -139,9 +136,10 @@ static void system_send_to_queue(void *packetPointer)
 {
    xQueueSendToBack(uartTx_queue, packetPointer, portMAX_DELAY);
 }
-static void system_lorawan_callback(void* rx_data, uint8_t packetId)
+static void system_lorawan_callback(uint8_t* rx_data, uint8_t packetId)
 {
-   uartHandler_t packetHandler = {0};
+
+   uint8_t packetHandler[GPIO_CONTROL_PACKET_SIZE] = {0};
 
    switch (packetId)
    {
@@ -149,7 +147,10 @@ static void system_lorawan_callback(void* rx_data, uint8_t packetId)
          systemParam.temperature = rylr993_read_temperature();
          break;
       case RYLR993_PIN_CONTROL:
-         memcpy(&packetHandler, rx_data, sizeof(uartHandler_t));
+         memcpy(packetHandler, rx_data, GPIO_CONTROL_PACKET_SIZE);
+
+         gpio_pin_control(rx_data[RLYR993_GPIO_NUM_POS], 
+                           rx_data[RLYR993_GPIO_STATE_POS]);
          break;
       
       default:

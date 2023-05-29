@@ -88,6 +88,10 @@
 #define MAX_PPACKETS			5
 #define MAX_PACKET_SIZE			100
 
+#define RLYR993_GPIO_NUM_POS    0
+
+#define RLYR993_GPIO_STATE_POS  1
+
 /* ENUMERATIONS --------------------------------------------------------------*/
 typedef enum
 {

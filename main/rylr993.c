@@ -71,6 +71,7 @@ static uint16_t rylr993_make_command    (char* targetString, char* command, char
 static uint16_t rylr993_make_request    (char* targetString, char* command);
 static bool     rylr993_packet_parser   (uint8_t* packet);
 static char *   rylr993_raw2hex         (uint8_t* dataBuffer, uint8_t dataSize);
+static uint8_t * rylr993_hex2raw        (char* dataBuffer, uint8_t dataSize);
 /* FUNCTION PROTOTYPES -------------------------------------------------------*/
 /**
  * @brief   Initialize LoRaWAN module driver that will send AT commands and callback a function when receiving data
@@ -250,12 +251,14 @@ static bool rylr993_packet_parser(uint8_t* packet)
 {
     bool validPacket = false;
 
-    int* unused = NULL;
+    int unused = 0;
 
     const uint8_t packetBase = 0;
     
-    rylr993_buffer module_data = {0};
+    char rxPacket[MAX_PACKET_SIZE] = {0};
     
+    int rxPacketSize = 0;
+
     //Offset buffer if it starts with space character 
     if(packet[packetBase] == SPACE)
     {
@@ -272,9 +275,12 @@ static bool rylr993_packet_parser(uint8_t* packet)
 
         if(isdigit(packet[packetBase]))
         {
-            sscanf((char*)packet, "%d:%d:%s", unused, (int*)&module_data.rxPacketSize, module_data.rxPacket);
+            sscanf((char*)packet, "%d:%d:%s", &unused, &rxPacketSize, rxPacket);
 
-            hRlyr993.receiveCallback(module_data.rxPacket, RYLR993_PIN_CONTROL);
+            
+            memcpy(rxPacket, rylr993_hex2raw(rxPacket, (uint8_t) rxPacketSize), rxPacketSize);
+            //First byte is the pin number and the next one is the pin state
+            hRlyr993.receiveCallback((uint8_t*) rxPacket, RYLR993_PIN_CONTROL);
         }
         if(!strncmp((char*)packet ,PARAM_REPORT ,strlen(PARAM_REPORT)))
         {
@@ -349,6 +355,25 @@ static char * rylr993_raw2hex(uint8_t* dataBuffer, uint8_t dataSize)
         sprintf(hexString + (i * 2), "%02X", dataBuffer[i]);
     }
     return hexString;
+}
+/**
+ * @brief 
+ * 
+ * @param dataBuffer 
+ * @param dataSize 
+ * @return uint8_t* 
+ */
+static uint8_t * rylr993_hex2raw(char* dataBuffer, uint8_t dataSize)
+{
+    uint8_t *rawData = (uint8_t *)malloc((dataSize * 2 + 1) * sizeof(uint8_t));
+
+    uint16_t dataLength = dataSize;
+
+    for (size_t i = 0; i < dataLength; i++) 
+    {
+        sscanf(dataBuffer + (i * 2), "%2hhX", &rawData[i]);
+    }
+    return rawData;
 }
 /**
  * @brief   Create send data packet to be sent over LoRaWAN
