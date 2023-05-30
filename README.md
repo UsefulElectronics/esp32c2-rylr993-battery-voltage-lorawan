@@ -19,7 +19,7 @@ In this tutorial, I have built a simple system that is powered with 1 W 5 V sola
 
 The system uses RYLR993 LoRaWAN Module and ESP32C2 as hosting MCU. The LoRaWAN module is controlled using AT commands over UART and contains an internal temperature sensor that the system makes use of.
 
-![Circuit Diagram](https://github.com/UsefulElectronics/esp32c2-tca6416a-i2c-pin-expander/blob/main/circuit-diagram/IMG_1317.PNG)
+![Circuit Diagram](https://github.com/UsefulElectronics/esp32c2-rylr993-battery-voltage-lorawan/blob/main/circuit%20diagram/system%20diagram.PNG)
 ***
 
 | Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-S2 | ESP32-S3 |
