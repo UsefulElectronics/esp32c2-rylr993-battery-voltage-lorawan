@@ -1,58 +1,27 @@
+[![Build Status](https://img.shields.io/badge/USEFUL%20ELECTRONICS-YOUTUBE-red)](https://www.youtube.com/user/wardzx1)
+
+# Sponsors
+
+### PCBWay
+Tutorial Series Sponsor PCBWay Website. You can get extra free coupons using the link below:
+
+[<img src="https://github.com/UsefulElectronics/esp32s3-gc9a01-lvgl/blob/main/banner/banner(320x100).gif">](https://www.pcbway.com/setinvite.aspx?inviteid=582640)
+
+### REYAX
+RYLR993 LoRaWAN module manufacturer 
+https://reyax.com/products/RYLR993
+***
+# ESP32 RYLR993 LoRaWAN Communication
+
+### [Tutorial Link](https://youtu.be/zhOi7GMKKLE) On [![Build Status](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/wardzx1) 
+
+In this tutorial, I have built a simple system that is powered with 1 W 5 V solar panel that monitors the connected battery voltage with ADC and gets the environment temperature and shares this information with the thing network over LoRaWAN. The system also supports modifying GPIO state wirelessly over LoRaWAN.
+
+The system uses RYLR993 LoRaWAN Module and ESP32C2 as hosting MCU. The LoRaWAN module is controlled using AT commands over UART and contains an internal temperature sensor that the system makes use of.
+
+![Circuit Diagram](https://github.com/UsefulElectronics/esp32c2-tca6416a-i2c-pin-expander/blob/main/circuit-diagram/IMG_1317.PNG)
+***
+
 | Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-S2 | ESP32-S3 |
 | ----------------- | ----- | -------- | -------- | -------- | -------- |
 
-# UART Asynchronous Example with Separate Receive and Transfer Tasks
-
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
-
-This example demonstrates how two asynchronous tasks can use the same UART interface for communication. One can use
-this example to develop more complex applications for serial communication.
-
-The example starts two FreeRTOS tasks:
-1. The first task periodically transmits `Hello world` via the UART.
-2. The second task task listens, receives and prints data from the UART.
-
-## How to use example
-
-### Hardware Required
-
-The example can be run on any commonly available ESP32, ESP32-S and ESP32-C series based development board. You will need a USB cable to connect the
-development board to a computer, and a simple one-wire cable for shorting two pins of the board.
-
-### Setup the Hardware
-
-The `RXD_PIN` and `TXD_PIN` which are configurable in the code (by default `GPIO4` and `GPIO5`) need to be shorted in
-order to receive back the same data which were sent out.
-
-### Configure the project
-
-```
-idf.py menuconfig
-```
-
-### Build and Flash
-
-Build the project and flash it to the board, then run monitor tool to view serial output:
-
-```
-idf.py -p PORT flash monitor
-```
-
-(To exit the serial monitor, type ``Ctrl-]``.)
-
-See the Getting Started Guide for full steps to configure and use ESP-IDF to build projects.
-
-## Example Output
-
-You will receive the following repeating output from the monitoring console:
-```
-...
-I (3261) TX_TASK: Wrote 11 bytes
-I (4261) RX_TASK: Read 11 bytes: 'Hello world'
-I (4261) RX_TASK: 0x3ffb821c   48 65 6c 6c 6f 20 77 6f  72 6c 64                 |Hello world|
-...
-```
-
-## Troubleshooting
-
-If you do not see any output from `RX_TASK` then check if you have the `RXD_PIN` and `TXD_PIN` pins shorted on the board.
