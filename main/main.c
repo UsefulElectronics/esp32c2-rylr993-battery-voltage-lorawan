@@ -108,7 +108,7 @@ static void adc_handling_task(void *pvParameters)
 
 static void system_task(void *pvParameters)
 {
-   const uint16_t task_period = 30000; //ms
+   const uint32_t task_period = 60000 * 30; //ms = 30min
 
    static uint8_t networkJoined = 0;
 
